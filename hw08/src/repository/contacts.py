@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from typing import List
+
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +24,7 @@ class ContactRepository:
             .limit(limit)
         )
         contacts = await self.db.execute(stmt)
-        return contacts.scalars().all()
+        return list(contacts.scalars().all())
 
     async def get_contact_by_id(self, contact_id: int) -> Contact | None:
         stmt = select(Contact).filter_by(id=contact_id)
@@ -57,7 +58,7 @@ class ContactRepository:
 
     async def is_contact_exists(self, email: str, phone: str) -> bool:
         query = select(Contact).where(
-            (Contact.email == email) | (Contact.phone == phone)
+            or_(Contact.email == email, Contact.phone == phone)
         )
         result = await self.db.execute(query)
         return result.scalars().first() is not None
@@ -88,4 +89,4 @@ class ContactRepository:
         )
 
         result = await self.db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
