@@ -1,13 +1,13 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.repository.contacts import ContactRepository
+from src.repository.contacts_in_file import ContactRepository
 from src.schemas import ContactModel
 
 
 class ContactService:
     def __init__(self, db: AsyncSession):
-        self.repository = ContactRepository(db)
+        self.repository = ContactRepository()
 
     async def create_contact(self, body: ContactModel):
         if await self.repository.is_contact_exists(body.email, body.phone):
